@@ -1,0 +1,31 @@
+#!/bin/sh
+#%# family=contrib
+#%# capabilities=autoconf suggest
+
+PATH=$PATH:/usr/local/bin
+
+if [ "$1" = "suggest" ]; then
+	exit 0
+fi
+
+if [ "$1" = "autoconf" ]; then
+	exit 0
+fi
+
+if [ "$1" = "config" ]; then
+	echo 'graph_title Temperature'
+	echo 'graph_category sensors'
+	echo 'graph_vlabel C'
+	echo 'graph_scale no'
+	echo 'cpu.label CPU'
+	echo 'gpu.label GPU'
+	echo 'rht03t.label RHT03 RHT03'
+	exit 0
+fi
+
+echo "cpu.value `ok-sensor-cpu-temp`"
+echo "gpu.value `ok-sensor-gpu-temp`"
+echo "rht03t.value `ok-sensor-rht03-temp`"
+
+exit 0
+

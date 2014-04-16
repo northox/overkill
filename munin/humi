@@ -1,0 +1,27 @@
+#!/bin/sh
+#%# family=contrib
+#%# capabilities=autoconf suggest
+
+PATH=$PATH:/usr/local/bin
+
+if [ "$1" = "suggest" ]; then
+	exit 0
+fi
+
+if [ "$1" = "autoconf" ]; then
+	exit 0
+fi
+
+if [ "$1" = "config" ]; then
+	echo 'graph_title Humidity'
+	echo 'graph_category sensors'
+	echo 'graph_vlabel %'
+	echo 'graph_scale no'
+	echo 'rht03h.label RHT03'
+	exit 0
+fi
+
+echo "rht03h.value `ok-sensor-rht03-humi`"
+
+exit 0
+

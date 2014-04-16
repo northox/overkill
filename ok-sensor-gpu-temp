@@ -1,0 +1,2 @@
+#!/bin/sh
+echo $(sudo /opt/vc/bin/vcgencmd measure_temp) | sed -r 's/temp=([0-9]+\.[0-9]+).C/\1/'

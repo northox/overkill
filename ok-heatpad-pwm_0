@@ -1,0 +1,6 @@
+#!/bin/bash
+CONFIG_FILE="/etc/ok.conf"
+. $CONFIG_FILE
+
+gpio -g mode $HEATPAD_PIN pwm
+gpio -g pwm $HEATPAD_PIN 0

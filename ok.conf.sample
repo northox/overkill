@@ -1,0 +1,21 @@
+TMP="/var/cache/overkill"
+
+# Heatpad
+HEATPAD_PIN=25
+
+# Raspistill
+EXPOSURE="auto"
+AWB="sun"
+SLEEP=5000
+TIME=5805000
+
+# Youtube
+USER="x@gmail.com"
+PASS=""
+TITLE="Sunrise timelapse - $DATE"
+DESC="Raspberry Pi"
+CATE="Entertainment"
+KEYW="Time-lapse Photography, Raspberry Pi (Computer)"
+
+# Tweeter
+TWEET="Bang! bang! "

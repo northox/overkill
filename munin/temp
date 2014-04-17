@@ -19,7 +19,7 @@ if [ "$1" = "config" ]; then
 	echo 'graph_scale no'
 	echo 'cpu.label CPU'
 	echo 'gpu.label GPU'
-	echo 'rht03t.label RHT03 RHT03'
+	echo 'rht03t.label RHT03'
 	exit 0
 fi
 

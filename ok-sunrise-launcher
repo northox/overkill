@@ -1,0 +1,38 @@
+#!/usr/bin/env python
+# Launch a command (i.e. argv[1] 30min before sunrise)
+import sys
+import ephem
+from datetime import date, time, datetime, timedelta
+from apscheduler.scheduler import Scheduler
+from subprocess import call
+ 
+def timelapse_sunrise_job():
+    call(sys.argv[1]) 
+    sys.exit(0);
+ 
+def main():
+    if len(sys.argv) < 2:
+        sys.exit('Usage: %s <command>' % sys.argv[0])
+  
+    sun = ephem.Sun()
+    home = ephem.Observer()
+   
+    # get GPS coordinates and time based on GPS PPS
+    home.lat, home.lon = '45.458165', '-73.541586'
+    home.date = ephem.date(datetime.utcnow())
+
+    # find sunrise
+    sun.compute(home)
+    sunrise = home.next_rising(sun)
+    sunrise_time = ephem.localtime(sunrise)
+
+    # schedule 30 minute before sunrise
+    exec_time = sunrise_time + timedelta(minutes=-30)
+    sched = Scheduler(standalone=True)
+    exec_time = datetime(int(exec_time.strftime('%Y')), int(exec_time.strftime('%m')), 18, 17, 53)
+    job = sched.add_date_job(timelapse_sunrise_job, exec_time)
+    sched.start()
+
+ 
+if __name__ == "__main__":
+    main()

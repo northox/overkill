@@ -6,7 +6,7 @@ DATE=`date +%Y-%m-%d`
 VIDEO="$TMP/$DATE.avi"
 LIST="$TMP/stills.list"
 
-sudo raspistill -o $TMP/tl_%04d.jpg -tl 5000 -t 1200000 --nopreview --exposure $EXPOSURE --awb $AWB
+sudo raspistill -o $TMP/tl_%04d.jpg -tl $SLEEP -t $TIME --nopreview --exposure $EXPOSURE --awb $AWB
 
 ls $TMP/tl_*.jpg > $LIST
 
@@ -28,6 +28,6 @@ if [ $_return -ne 0 ]; then
   exit 1
 fi
 
-#twitter set "$TWEET$URL"
+twitter set "$TWEET$URL"
 rm $VIDEO
 exit 0

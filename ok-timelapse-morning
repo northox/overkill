@@ -12,9 +12,22 @@ ls $TMP/tl_*.jpg > $LIST
 
 mencoder -nosound -ovc lavc -lavcopts vcodec=mpeg4:aspect=16/9:vbitrate=8000000 -vf scale=1920:1080 -o $VIDEO -mf type=jpeg:fps=24 mf://@$LIST
 
+if [ -f $VIDEO ]; then
+  echo Error: video missing!
+  exit 1
+fi
+
 sudo rm $TMP/tl_*.jpg $LIST
 
 URL=`youtube-upload --email=$USER --password=$PASS --title=$TITLE --description=$DESC --category=$CATE --keywords=$KEYW$VIDEO`
-twitter set "$TWEET$URL"
 
+echo 'https://t.co/asdf' | grep -e '^https://'
+_return=$?
+if [ $_return -ne 0 ]; then
+  echo Error: youtube url missing!
+  exit 1
+fi
+
+twitter set "$TWEET$URL"
 rm $VIDEO
+exit 0

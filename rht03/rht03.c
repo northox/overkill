@@ -11,6 +11,7 @@
 #define	RHT03_PIN 7
 #define SAMPLE_SIZE 4
 #define SLEEP 20000
+#define SLEEP_NODATA 5000
 #define OFFCHART 10
 
 const char * tfile = "/var/cache/overkill/rht03/t";
@@ -30,21 +31,23 @@ void write(const char *file, int *buf)
 }
 
 // move index across the array
-void step (int *index)
+void step (int *pi)
 {
-  if (*index == SAMPLE_SIZE - 1)
-    index = 0;
+  if (*pi == SAMPLE_SIZE - 1)
+    *pi = 0;
   else
-    index++;
+    *pi += 1;
 }
 
 int main (void)
 {
+  // TODO use a struct and get rid of duplication
   int temp, humi, ntemp, nhumi, ttemp, thumi, atemp, ahumi;
   int index, i;
   bool first;
   int temps[SAMPLE_SIZE];
   int humis[SAMPLE_SIZE];
+  int *pindex = &index;
 
   temp = humi = ntemp = nhumi = ttemp = thumi = atemp = ahumi = 0;
   i = index = 0;
@@ -56,8 +59,10 @@ int main (void)
   for(;;)
   {
     // no new data
-    if (!readRHT03 (RHT03_PIN, &ntemp, &nhumi))
+    if (!readRHT03 (RHT03_PIN, &ntemp, &nhumi)) {
+      delay(SLEEP_NODATA);
       continue;
+    }
     
     // initialize samples
     if (first == true)
@@ -71,6 +76,7 @@ int main (void)
     } 
 
     // Compute average
+    ttemp = thumi = 0;
     for (i=0; i<SAMPLE_SIZE; i++)
     {
       ttemp += temps[i];
@@ -98,7 +104,7 @@ int main (void)
       write(hfile , &humi);
     }
     
-    step(&index);
+    step(pindex);
     delay(SLEEP);
   }
 

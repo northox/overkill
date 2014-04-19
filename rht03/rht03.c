@@ -1,34 +1,17 @@
 /*
- * rht03.c:
- *	Driver for the MaxDetect series sensors
- *
- * Copyright (c) 2012-2013 Gordon Henderson. <projects@drogon.net>
- ***********************************************************************
- * This file is part of wiringPi:
- *	https://projects.drogon.net/raspberry-pi/wiringpi/
- *
- *    wiringPi is free software: you can redistribute it and/or modify
- *    it under the terms of the GNU Lesser General Public License as published by
- *    the Free Software Foundation, either version 3 of the License, or
- *    (at your option) any later version.
- *
- *    wiringPi is distributed in the hope that it will be useful,
- *    but WITHOUT ANY WARRANTY; without even the implied warranty of
- *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *    GNU Lesser General Public License for more details.
- *
- *    You should have received a copy of the GNU Lesser General Public License
- *    along with wiringPi.  If not, see <http://www.gnu.org/licenses/>.
- ***********************************************************************
- */
-
+ * GNU Lesser General Public License
+*/
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 #include <wiringPi.h>
 #include <maxdetect.h>
 
 #define	RHT03_PIN 7
+#define SAMPLE_SIZE 4
+#define SLEEP 20000
+#define OFFCHART 10
 
 const char * tfile = "/var/cache/overkill/rht03/t";
 const char * hfile = "/var/cache/overkill/rht03/h";
@@ -46,35 +29,77 @@ void write(const char *file, int *buf)
   fclose(f);
 }
 
+// move index across the array
+void step (int *index)
+{
+  if (*index == SAMPLE_SIZE - 1)
+    index = 0;
+  else
+    index++;
+}
+
 int main (void)
 {
-  int temp, rh;
-  int newTemp, newRh;
+  int temp, humi, ntemp, nhumi, ttemp, thumi, atemp, ahumi;
+  int index, i;
+  bool first;
+  int temps[SAMPLE_SIZE];
+  int humis[SAMPLE_SIZE];
 
-  temp = rh = newTemp = newRh = 0;
-
+  temp = humi = ntemp = nhumi = ttemp = thumi = atemp = ahumi = 0;
+  i = index = 0;
+  first = true;
+  
   wiringPiSetup();
   piHiPri(55);
 
   for(;;)
   {
-    delay(5000);
-
     // no new data
-    if (!readRHT03 (RHT03_PIN, &newTemp, &newRh))
+    if (!readRHT03 (RHT03_PIN, &ntemp, &nhumi))
       continue;
-
-    // some new data but equal to the old one
-    if (temp != newTemp)
+    
+    // initialize samples
+    if (first == true)
     {
-      temp = newTemp;
+      for (i=0; i<SAMPLE_SIZE; i++)
+      {
+        temps[i] = ntemp;
+        humis[i] = nhumi;
+      }
+      first = false;
+    } 
+
+    // Compute average
+    for (i=0; i<SAMPLE_SIZE; i++)
+    {
+      ttemp += temps[i];
+      thumi += humis[i];
+    }
+    atemp = ttemp / SAMPLE_SIZE;
+    ahumi = thumi / SAMPLE_SIZE;
+
+    // some new data but not equal to lastest
+    if (temp != ntemp)
+    {
+      // use average if offchart
+      if (ntemp > temp + OFFCHART || ntemp < temp - OFFCHART)
+        ntemp = atemp;
+      
+      temps[index] = temp = ntemp;
       write(tfile, &temp);
     }
-    if (rh != newRh)
+    if (humi != nhumi)
     {
-      rh   = newRh;
-      write(hfile , &rh);
+      if (nhumi > humi + OFFCHART || nhumi < humi - OFFCHART) 
+        nhumi = ahumi;
+      
+      humis[index] = humi = nhumi;
+      write(hfile , &humi);
     }
+    
+    step(&index);
+    delay(SLEEP);
   }
 
   return 0;

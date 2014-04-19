@@ -4,6 +4,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 #include <wiringPi.h>
 #include <maxdetect.h>
@@ -17,7 +20,7 @@
 const char * tfile = "/var/cache/overkill/rht03/t";
 const char * hfile = "/var/cache/overkill/rht03/h";
 
-void write(const char *file, int *buf)
+void writebuf(const char *file, int *buf)
 {
   FILE *f = fopen(file, "w");
   if (f == NULL)
@@ -39,8 +42,28 @@ void step (int *pi)
     *pi += 1;
 }
 
-int main (void)
+int main (int argc, char* argv[])
 {
+  pid_t process_id = 0;
+  pid_t sid = 0;
+  process_id = fork();
+  if (process_id < 0)
+  {
+    fprintf(stderr, "Error: fork()\n");
+    exit(1);
+  } 
+  if (process_id > 0)
+    exit(0);
+  
+  umask(0);
+  sid = setsid();
+  if (sid < 0)
+    exit(1);
+  chdir("/");
+  close(STDIN_FILENO);
+  close(STDOUT_FILENO); 
+  close(STDERR_FILENO);  
+
   // TODO use a struct and get rid of duplication
   int temp, humi, ntemp, nhumi, ttemp, thumi, atemp, ahumi;
   int index, i;
@@ -93,7 +116,7 @@ int main (void)
         ntemp = atemp;
       
       temps[index] = temp = ntemp;
-      write(tfile, &temp);
+      writebuf(tfile, &temp);
     }
     if (humi != nhumi)
     {
@@ -101,12 +124,12 @@ int main (void)
         nhumi = ahumi;
       
       humis[index] = humi = nhumi;
-      write(hfile , &humi);
+      writebuf(hfile , &humi);
     }
     
     step(pindex);
     delay(SLEEP);
   }
 
-  return 0;
+  return(0);
 }

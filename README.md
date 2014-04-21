@@ -8,10 +8,10 @@ Here's some [pictures](https://plus.google.com/photos/113754991837021958718/albu
 ## Commands
 
 ### ok-heatpad-on
-Send 3.3v on GPIO $HEATPAD_PIN.
+Set GPIO $HEATPAD_PIN on - send 3.3v.
 
 ### ok-heatpad-off
-Stop sending 3.3v on GPIO $HEATPAD_PIN.
+Set GPIO $HEATPAD_PIN off - stop 3.3v.
 
 ### ok-heatpad-read
 Return GPIO $HEATPAD_PIN value.
@@ -49,17 +49,24 @@ Requires ok-gpsd daemon.
 ### ok-timelapse-sunrise
 Create a timelapse, upload the video to youtube and post the link on twitter.
 
-See ok.conf.
+    SLEEP=5000
+    TIME=6000000
 
-Requires [ptt](http://mike.verdone.ca/twitter/) and [youtube-upload](https://code.google.com/p/youtube-upload/) commands.
+With this config, a the pictures will be taken every 5 seconds for 100 minutes. The pictures are then used to create a video at 24 frame per seconds.
+
+See ok.conf.sample for all options.
+
+Requires mencoder, raspistill, [ptt](http://mike.verdone.ca/twitter/) and [youtube-upload](https://code.google.com/p/youtube-upload/) commands.
 
 ## Daemons
 
 ### ok-rht03d
 Save RHT03 sensor values to the filesystem at regular interval.
 
+Simply run `make rht03` within ok-rht03d to compile.
+
 ### ok-gpsd
-Save GPS values tn the filesystem at regular interval.
+Save GPS values on the filesystem at regular interval.
 
 ## Munin
 Plugins to monitor sensors.

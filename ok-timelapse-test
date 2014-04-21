@@ -6,7 +6,7 @@ DATE=`date +%Y-%m-%d`
 VIDEO="$TMP/$DATE.avi"
 LIST="$TMP/stills.list"
 
-sudo raspistill -o $TMP/tl_%04d.jpg -tl 5000 -t 1200000 --nopreview --exposure $EXPOSURE --awb $AWB
+sudo raspistill -o $TMP/tl_%04d.jpg -tl 3000 -t 120000 --nopreview --exposure $EXPOSURE --awb $AWB
 
 ls $TMP/tl_*.jpg > $LIST
 
@@ -19,7 +19,7 @@ fi
 
 sudo rm $TMP/tl_*.jpg $LIST
 
-URL=`youtube-upload --email=$USER --password=$PASS --title=$TITLE --description=$DESC --category=$CATE --keywords=$KEYW $VIDEO`
+URL=`youtube-upload --email=$USER --password=$PASS --title="$TITLE" --description="$DESC" --category="$CATE" --keywords="$KEYW" $VIDEO`
 
 echo $URL | grep -e '^https://'
 _return=$?

@@ -19,7 +19,7 @@ fi
 
 sudo rm $TMP/tl_*.jpg $LIST
 
-URL=`youtube-upload --email=$USER --password=$PASS --title=$TITLE --description=$DESC --category=$CATE --keywords=$KEYW $VIDEO`
+URL=`youtube-upload --email=$USER --password=$PASS --title="$TITLE" --description="$DESC" --category="$CATE" --keywords="$KEYW" $VIDEO`
 
 echo $URL | grep -e '^https://'
 _return=$?
@@ -28,6 +28,6 @@ if [ $_return -ne 0 ]; then
   exit 1
 fi
 
-twitter set "$TWEET$URL"
+twitter set "$TWEET $URL"
 rm $VIDEO
 exit 0

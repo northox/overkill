@@ -1,25 +1,49 @@
 #!/usr/bin/env python
-# Launch a command (i.e. argv[1] 30min before sunrise)
+# Launch a command (i.e. argv[1]) x minutes before (e.g. argv[2] = -30m) or after sunrise (e.g. argv[2] = +20m).
+import subprocess
+import re
+import os
 import sys
-import ephem
-from datetime import date, time, datetime, timedelta
-from apscheduler.scheduler import Scheduler
 from subprocess import call
+import datetime as dt
+import time
+import ephem
  
-def timelapse_sunrise_job():
-    call(sys.argv[1]) 
-    sys.exit(0);
+def job():
+    subprocess.call(sys.argv[1], shell=True)
+
+def find_location():
+    proc = subprocess.Popen(["gpscat", "/dev/ttyAMA0"], stdout=subprocess.PIPE)
+    for line in proc.stdout:
+        m = re.search("^\$GPRMC,[0-9]+\.[0-9]+,A,([\.0-9]+),([NS]),([\.0-9]+),([EW]),", line)
+        if(m):
+            proc.terminate()
+            lat, lon = float(m.group(1)), float(m.group(3))
+            ns, ew = m.group(2), m.group(4)
+            if (ns == 'S'): lat *= -1
+            if (ew == 'W'): lon *= -1
+            flat = "%s" % (lat / 100)
+            flon = "%s" % (lon / 100)
+            return(flat, flon)
+
+def to_timestamp(date, epoch=dt.datetime(1970,1,1)):
+    td = date - epoch
+    return td.total_seconds()
  
-def main():
-    if len(sys.argv) < 2:
-        sys.exit('Usage: %s <command>' % sys.argv[0])
-  
+if __name__ == "__main__":
+    # TODO no time to mess with this Device busy' - raspi is single user
+    if not os.geteuid() == 0:
+        exit("Must be run as root!");
+
+    if len(sys.argv) < 3:
+        exit('Usage: %s <command> <offset (e.g. -30m)>' % sys.argv[0])
+
     sun = ephem.Sun()
     home = ephem.Observer()
-   
+
     # get GPS coordinates and time based on GPS PPS
-    home.lat, home.lon = '45.458165', '-73.541586'
-    home.date = ephem.date(datetime.utcnow())
+    home.lat, home.lon = find_location()
+    home.date = ephem.date(dt.datetime.utcnow())
 
     # find sunrise
     sun.compute(home)
@@ -27,12 +51,10 @@ def main():
     sunrise_time = ephem.localtime(sunrise)
 
     # schedule 30 minute before sunrise
-    exec_time = sunrise_time + timedelta(minutes=-30)
-    sched = Scheduler(standalone=True)
-    exec_time = datetime(int(exec_time.strftime('%Y')), int(exec_time.strftime('%m')), 18, 17, 53)
-    job = sched.add_date_job(timelapse_sunrise_job, exec_time)
-    sched.start()
-
- 
-if __name__ == "__main__":
-    main()
+    exec_time = sunrise_time + timedelta(minutes=argv[2])
+    #exec_time = dt.datetime.now() + dt.timedelta(minutes=1) # debug
+   
+    sleep = to_timestamp(exec_time) - to_timestamp(dt.datetime.now())
+    time.sleep(sleep)
+    
+    job()

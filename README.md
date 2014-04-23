@@ -1,7 +1,7 @@
 # overkill
 An overkill Raspberry Pi project.
 
-Currently used for timelapse. Still tweaking the heatpad to support very low temperature - Yeah it's Canada here (can go down to -30c).
+Currently used for timelapse. Still tweaking the heatpad to support very low temperature - Yeah it's Canada here and it can go down -30 celcius in winter and +30 in summer.
 
 Here's some [pictures](https://plus.google.com/photos/113754991837021958718/albums/5970466140155217569) and some [timelapses](https://twitter.com/RasPimelapse).
 
@@ -42,7 +42,7 @@ Examples:
 
 This cron job will start at 5am but the command will only be launch 30 minutes before sunrise based on current GPS coordinates.
     
-    0  5	* * *	root /usr/local/bin/ok-sunrise-launcher /usr/local/bin/ok-timelapse-test -30
+    0  5	* * *	root /usr/local/bin/ok-sunrise-launcher /usr/local/bin/ok-timelapse-test -30m
 
 ### ok-timelapse-sunrise
 Create a timelapse, upload the video to youtube and post the link on twitter.
@@ -50,7 +50,7 @@ Create a timelapse, upload the video to youtube and post the link on twitter.
     SLEEP=5000
     TIME=6000000
 
-With this config, a the pictures will be taken every 5 seconds for 100 minutes. The pictures are then used to create a video at 24 frame per seconds.
+With this config, pictures will be taken every 5 seconds for 100 minutes. The pictures are then used to create a video at 24 frame per seconds.
 
 See ok.conf.sample for all options.
 

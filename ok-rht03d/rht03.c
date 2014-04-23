@@ -1,6 +1,10 @@
-/*
- * GNU Lesser General Public License
-*/
+/**
+ * @title Overkill ok-rth03d Daemon
+ * @descrition rht03 sensor file daemon
+ * @author Danny Fullerton - Mantor Organization
+ * @license MIT
+ * @acknowledgements Orgininaly part of WiringPi Project from Gordon Henderson
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>

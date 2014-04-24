@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Launch a command (i.e. argv[1]) x minutes before (e.g. argv[2] = -30m) or after sunrise (e.g. argv[2] = +20m).
+# Launch a command (i.e. argv[1]) x minutes before (e.g. argv[2] = -30) or after sunrise (e.g. argv[2] = +20).
 import subprocess
 import re
 import os
@@ -13,6 +13,7 @@ def job():
     subprocess.call(sys.argv[1], shell=True)
 
 def find_location():
+    # TODO dev in config file
     proc = subprocess.Popen(["gpscat", "/dev/ttyAMA0"], stdout=subprocess.PIPE)
     for line in proc.stdout:
         m = re.search("^\$GPRMC,[0-9]+\.[0-9]+,A,([\.0-9]+),([NS]),([\.0-9]+),([EW]),", line)
@@ -22,7 +23,7 @@ def find_location():
             ns, ew = m.group(2), m.group(4)
             if (ns == 'S'): lat *= -1
             if (ew == 'W'): lon *= -1
-            flat = "%s" % (lat / 100)
+            flat = "%s" % (lat / 100) # ??????????????????????????????????????????????????????????????????????????
             flon = "%s" % (lon / 100)
             return(flat, flon)
 
@@ -36,7 +37,7 @@ if __name__ == "__main__":
         exit("Must be run as root!");
 
     if len(sys.argv) < 3:
-        exit('Usage: %s <command> <offset (e.g. -30m)>' % sys.argv[0])
+        exit('Usage: %s <command> <offset (e.g. -30)>' % sys.argv[0])
 
     sun = ephem.Sun()
     home = ephem.Observer()
@@ -51,7 +52,7 @@ if __name__ == "__main__":
     sunrise_time = ephem.localtime(sunrise)
 
     # schedule 30 minute before sunrise
-    exec_time = sunrise_time + timedelta(minutes=argv[2])
+    exec_time = sunrise_time + timedelta(minutes=argv[2] + 'm')
     #exec_time = dt.datetime.now() + dt.timedelta(minutes=1) # debug
    
     sleep = to_timestamp(exec_time) - to_timestamp(dt.datetime.now())

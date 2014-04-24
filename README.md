@@ -42,7 +42,7 @@ Examples:
 
 This cron job will start at 5am but the command will only be launch 30 minutes before sunrise based on current GPS coordinates.
     
-    0  5	* * *	root /usr/local/bin/ok-sunrise-launcher /usr/local/bin/ok-timelapse-test -30m
+    0  5	* * *	root /usr/local/bin/ok-sunrise-launcher /usr/local/bin/ok-timelapse-test -30
 
 ### ok-timelapse-sunrise
 Create a timelapse, upload the video to youtube and post the link on twitter.

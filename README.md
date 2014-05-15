@@ -44,6 +44,13 @@ This cron job will start at 5am but the command will only be launch 30 minutes b
     
     0  5	* * *	root /usr/local/bin/ok-sunrise-launcher /usr/local/bin/ok-timelapse-test -30
 
+To test you can use the -t argument. The first use a -6 degree horizon angle and the second simply start 30 minutes before sunrise.
+
+    # ok-sunrise-launcher ok-timelapse-sunrise -0 -6 -t
+    Next sunrise at 2014-05-15 04:46:25.000003 - sleeping for 21165.0656991 seconds
+    # ok-sunrise-launcher ok-timelapse-sunrise -0 -0 -t
+    Next sunrise at 2014-05-15 05:23:08.000003 - sleeping for 23362.9776301 seconds
+
 ### ok-timelapse-sunrise
 Create a timelapse, upload the video to youtube and post the link on twitter.
 

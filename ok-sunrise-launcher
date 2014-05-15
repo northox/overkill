@@ -8,10 +8,16 @@ from subprocess import call
 import datetime as dt
 import time
 import ephem
- 
+
+def check_int(s):
+    if s[0] in ('-', '+'):
+        return s[1:].isdigit()
+    return s.isdigit()
+
 def job():
     subprocess.call(sys.argv[1], shell=True)
 
+# TODO BUG: will hang if no fix
 def find_location():
     # TODO dev in config file
     proc = subprocess.Popen(["gpscat", "/dev/ttyAMA0"], stdout=subprocess.PIPE)
@@ -36,15 +42,32 @@ if __name__ == "__main__":
     if not os.geteuid() == 0:
         exit("Must be run as root!");
 
-    if len(sys.argv) < 3:
-        exit('Usage: %s <command> <offset (e.g. -30)>' % sys.argv[0])
+    if len(sys.argv) < 4:
+        exit('Usage: %s <command> <offset (e.g. -30)> <horizon angle (e.g. -6)>' % sys.argv[0])
 
+    offset = 0
+    if sys.argv[2]:
+        if check_int(sys.argv[2]):
+            offset = sys.argv[2]
+        else:
+            print("Error: offset argument must be a positive or negative number")
+            exit(1)
+
+    angle = 0
+    if sys.argv[3]:
+        if check_int(sys.argv[3]):
+            angle = sys.argv[3]
+        else:
+            print("Error: horizon angle argument must be a positive or negative number")
+            exit(1)
+      
     sun = ephem.Sun()
     home = ephem.Observer()
 
     # get GPS coordinates and time based on GPS PPS
     home.lat, home.lon = find_location()
     home.date = ephem.date(dt.datetime.utcnow())
+    home.horizon = angle
 
     # find sunrise
     sun.compute(home)
@@ -52,10 +75,15 @@ if __name__ == "__main__":
     sunrise_time = ephem.localtime(sunrise)
 
     # schedule 30 minute before sunrise
-    exec_time = sunrise_time + timedelta(minutes=argv[2] + 'm')
-    #exec_time = dt.datetime.now() + dt.timedelta(minutes=1) # debug
-   
+    exec_time = sunrise_time + dt.timedelta(minutes=int(sys.argv[2]))
+
     sleep = to_timestamp(exec_time) - to_timestamp(dt.datetime.now())
+    
+    if len(sys.argv) > 4: 
+        if sys.argv[4] == '-t':
+            print("Next sunrise at %s - sleeping for %s seconds" % (exec_time, sleep))
+            exit(0)
+   
     time.sleep(sleep)
     
     job()

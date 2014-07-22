@@ -17,7 +17,7 @@ def check_int(s):
 def job():
     subprocess.call(sys.argv[1], shell=True)
 
-# TODO BUG: will hang if no fix
+# TODO BUG: will hang if no fix - add timeout
 def find_location():
     # TODO dev in config file
     proc = subprocess.Popen(["gpscat", "/dev/ttyAMA0"], stdout=subprocess.PIPE)
@@ -29,7 +29,7 @@ def find_location():
             ns, ew = m.group(2), m.group(4)
             if (ns == 'S'): lat *= -1
             if (ew == 'W'): lon *= -1
-            flat = "%s" % (lat / 100) # ??????????????????????????????????????????????????????????????????????????
+            flat = "%s" % (lat / 100)
             flon = "%s" % (lon / 100)
             return(flat, flon)
 
@@ -42,8 +42,9 @@ if __name__ == "__main__":
     if not os.geteuid() == 0:
         exit("Must be run as root!");
 
+    # TODO add help msg
     if len(sys.argv) < 4:
-        exit('Usage: %s <command> <offset (e.g. -30)> <horizon angle (e.g. -6)>' % sys.argv[0])
+        exit('Usage: %s <command> <offset (e.g. -30)> <horizon angle (e.g. -6)> [-t]' % sys.argv[0])
 
     offset = 0
     if sys.argv[2]:

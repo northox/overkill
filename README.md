@@ -66,7 +66,7 @@ Requires mencoder, raspistill, [ptt](http://mike.verdone.ca/twitter/) and [youtu
 ## ok-rht03d daemon
 Save RHT03 sensor values to the filesystem at regular interval.
 
-Simply run `make rht03` within ok-rht03d to compile.
+Simply run `make` to compile and `make install` to install.
 
 ## Munin stats
 Plugins to monitor sensors.

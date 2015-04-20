@@ -16,12 +16,12 @@ LDLIBS    = -lwiringPi -lwiringPiDev -lpthread -lm
 
 ###############################################################################
 
-SRC	=	rht03.c
+SRC	=	ok-rht03.c
 OBJ	=	$(SRC:.c=.o)
 BINS	=	$(SRC:.c=)
 
-rht03:	rht03.o
-	@$(CC) -o $@ rht03.o $(LDFLAGS) $(LDLIBS) 
+ok-rht03:	ok-rht03.o
+	@$(CC) -o $@ ok-rht03.o $(LDFLAGS) $(LDLIBS) 
 
 clean:
 	@rm -f $(OBJ) *~ core $(BINS)

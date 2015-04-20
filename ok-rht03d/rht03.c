@@ -19,8 +19,9 @@
 #define	GPIO_PIN 7
 #define SAMPLE_SIZE 8
 #define SLEEP 5 * 60 * 1000
-#define SLEEP_NODATA 7 * 60 * 1000
+#define SLEEP_NODATA 7 * 1000
 #define OFFCHART 20
+
  
 char * temp_path = "/var/cache/overkill/rht03/t";
 char * humi_path = "/var/cache/overkill/rht03/h";
@@ -46,9 +47,6 @@ void step_si()
     si = 0;
   else
     si += 1;
-#ifdef DEBUG 
-    printf("%s: %i\n", __func__, si);
-#endif
 }
  
 void set(Sensor * s)
@@ -87,30 +85,32 @@ void set_avg(Sensor * s)
   printf("%s: total:%i, avg:%i\n", __func__, total, s->avg);
 #endif
 }
+
+FILE * xfopen(char *file)
+{
+  FILE *f = fopen(file, "w");
+  if (f == NULL) {
+    fprintf(stderr, "Can't open output file %s!\n", file);
+    exit(1);
+  }
+  
+  return(f);
+}
  
 void init(Rht03 * r)
 {
-  r->temp.fd = fopen(temp_path, "w");
-  if (r->temp.fd == NULL) {
-    fprintf(stderr, "Can't open temp file %s!\n", temp_path);
-    exit(1);
-  }
-
-  r->humi.fd = fopen(humi_path, "w");
-  if (r->humi.fd == NULL) {
-    fprintf(stderr, "Can't open humi file %s!\n", humi_path);
-    exit(1);
-  }
+  r->temp.fd = xfopen(temp_path);
+  r->humi.fd = xfopen(humi_path);
 
   for(;;) {
     if (readRHT03 (GPIO_PIN, &r->temp.new, &r->humi.new))
       break;
     delay(SLEEP_NODATA);
   }
-
   r->temp.avg = r->temp.old = r->temp.new;
   r->humi.avg = r->humi.old = r->humi.new;
 
+  // Write initial values
   fprintf(r->temp.fd, "%1.1f\n", r->temp.new / 10.0);
   fflush(r->temp.fd);
   fprintf(r->humi.fd, "%1.1f\n", r->humi.new / 10.0);
@@ -119,7 +119,8 @@ void init(Rht03 * r)
 #ifdef DEBUG 
   printf("%s: temp:%i, humi:%i\n", __func__, r->temp.avg, r->humi.avg);
 #endif
-  
+
+  // Setup samples table
   int i;
   for (i=0; i<SAMPLE_SIZE; i++) {
     r->temp.sample[i] = r->temp.new;

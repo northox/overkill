@@ -63,7 +63,8 @@ void set(Sensor * s)
     fprintf(stderr, "fd is null\n");
     exit(1);
   }
-
+  
+  rewind(s->fd);
   fprintf(s->fd, "%1.1f\n", s->new / 10.0);
   fflush(s->fd);
 #ifdef DEBUG 
@@ -111,8 +112,10 @@ void init(Rht03 * r)
   r->humi.avg = r->humi.old = r->humi.new;
 
   // Write initial values
+  rewind(r->temp.fd);
   fprintf(r->temp.fd, "%1.1f\n", r->temp.new / 10.0);
   fflush(r->temp.fd);
+  rewind(r->humi.fd);
   fprintf(r->humi.fd, "%1.1f\n", r->humi.new / 10.0);
   fflush(r->humi.fd);
 

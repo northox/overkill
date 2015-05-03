@@ -75,7 +75,7 @@ if __name__ == "__main__":
     sunrise = home.next_rising(sun)
     sunrise_time = ephem.localtime(sunrise)
 
-    # schedule 30 minute before sunrise
+    # offset in minutes, e.g. -30 means 30 minutes before sunrise
     exec_time = sunrise_time + dt.timedelta(minutes=int(sys.argv[2]))
 
     sleep = to_timestamp(exec_time) - to_timestamp(dt.datetime.now())
